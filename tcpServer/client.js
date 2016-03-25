@@ -1,18 +1,25 @@
-var api = {};
+"use strict";
+
+
+let api = {};
 global.api = api;
 api.net = require('net');
 
-var socket = new api.net.Socket();
-var user;
+const socket = new api.net.Socket();
 
 socket.connect({
   port: 2000,
   host: '127.0.0.1',
-}, function() {
-  socket.write('Hello from client');
-  socket.on('data', function(data) {
-    user = JSON.parse(data);
+}, () => {
+  console.log('Hello from client');
+  socket.on('data', (data) => {
     console.log('Data received (by client): ' + data);
-    console.log('Age of ' + user.name + ' is ' + user.age);
+    const task_def = JSON.parse(data);
+
+    const result = {
+      idx: task_def.idx,
+      result: task_def.data.map((i) => i*2),
+    }
+    socket.write(JSON.stringify(result)); 
   });
 });
