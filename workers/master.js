@@ -11,27 +11,42 @@ module.exports = function() {
   var task = [2, 17, 3, 2, 5, 7, 15, 22, 1, 14, 15, 9, 0, 11];
   var results = [];
 
-  workers.forEach(function(worker) {
+  function min(a, b) {
+    return a > b ? b : a;
+  }
 
-    worker.send({ task: task });
+  var count = 0;
 
-    worker.on('exit', function (code) {
-      console.log('exit ' + worker.process.pid + ' ' + code);
-    });
+  var taskSize = Math.ceil(task.length / cpuCount)
+  console.log('Task size : ' + taskSize);
 
-    worker.on('message', function (message) {
-      console.log(
-        'message from worker ' + worker.process.pid + ': ' +
-        JSON.stringify(message)
-      );
-      results.push(message.result);
+  for (var i = 0; i < workers.length; i++) {
+    (function(worker, id) {
 
-      if (results.length === cpuCount) {
-        process.exit(1);
-      }
+      var l = taskSize * id;
+      var r = min(taskSize * (id + 1), task.length);
 
-    });
+      worker.send({ task: task.slice(l, r) });
 
-  });
+      worker.on('exit', function (code) {
+        console.log('exit ' + worker.process.pid + ' ' + code);
+      });
+
+      worker.on('message', function (message) {
+        console.log(
+          'message from worker ' + worker.process.pid + ': ' +
+          JSON.stringify(message)
+        );
+        results[id] = message.result;
+        count++;
+        if (count === cpuCount) {
+          console.log('results : ' + results)
+          process.exit(1);
+        }
+
+      });
+
+    })(workers[i], i)
+  }
 
 };
