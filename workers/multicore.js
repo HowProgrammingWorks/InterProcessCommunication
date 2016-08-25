@@ -1,3 +1,5 @@
+'use strict';
+
 global.api = {};
 api.cluster = require('cluster');
 api.os = require('os');

@@ -1,15 +1,17 @@
+'use strict';
+
 module.exports = function() {
 
-  var cpuCount = api.os.cpus().length;
+  let cpuCount = api.os.cpus().length;
 
-  var workers = [];
-  for (var i = 0; i < cpuCount; i++) {
-    var worker = api.cluster.fork();
+  let workers = [];
+  for (let i = 0; i < cpuCount; i++) {
+    let worker = api.cluster.fork();
     workers.push(worker);
   }
 
-  var task = [2, 17, 3, 2, 5, 7, 15, 22, 1, 14, 15, 9, 0, 11];
-  var results = [];
+  let task = [2, 17, 3, 2, 5, 7, 15, 22, 1, 14, 15, 9, 0, 11];
+  let results = [];
 
   workers.forEach(function(worker) {
 

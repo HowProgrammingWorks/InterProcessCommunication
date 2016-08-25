@@ -1,13 +1,16 @@
-var api = {};
-global.api = api;
+'use strict';
+
+global.api = {};
 api.net = require('net');
 
-var user = { name: 'Marcus Aurelius', age: 1895 };
+let user = { name: 'Marcus Aurelius', age: 1895 };
 
-var server = api.net.createServer(function(socket) {
+let server = api.net.createServer((socket) => {
   socket.write(JSON.stringify(user));
   console.log('Connected: ' + socket.localAddress);
-  socket.on('data', function(data) {
+  socket.on('data', (data) => {
     console.log('Data received (by server): ' + data);
   });
-}).listen(2000);
+});
+
+server.listen(2000);
