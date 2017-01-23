@@ -3,7 +3,7 @@
 global.api = {};
 api.net = require('net');
 
-let socket = new api.net.Socket();
+const socket = new api.net.Socket();
 let user;
 
 socket.connect({
