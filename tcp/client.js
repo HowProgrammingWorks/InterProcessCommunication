@@ -4,6 +4,7 @@ global.api = {};
 api.net = require('net');
 
 const socket = new api.net.Socket();
+
 let user;
 
 socket.connect({

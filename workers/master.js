@@ -1,6 +1,6 @@
 'use strict';
 
-module.exports = function() {
+module.exports = () => {
 
   const cpuCount = api.os.cpus().length;
 
@@ -22,6 +22,7 @@ module.exports = function() {
     });
 
     worker.on('message', (message) => {
+
       console.log(
         'message from worker ' + worker.process.pid + ': ' +
         JSON.stringify(message)
