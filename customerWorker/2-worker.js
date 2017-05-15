@@ -1,6 +1,5 @@
-/**
- * Created by Yura on 11.04.2016.
- */
+'use strict';
+
 global.api = {};
 global.port = 10000;
 api.cluster = require('cluster');
