@@ -4,9 +4,9 @@ global.api = {};
 api.net = require('net');
 api.os = require('os');
 api.metasync = require('metasync');
-api.fs = require('fs');
+api.queue = require('./queue.js');
 
-const workers = [];
+const workersQueue = new api.queue.Queue();
 let workerId = 0;
 let taskId = 0;
 
@@ -19,30 +19,34 @@ api.net.createServer((clientSocket) => {
     const obj = JSON.parse(data);
     obj.taskId = taskId++;
     console.dir(obj);
-    const workerParams = workers.pop();
-    const workerSocket = new api.net.Socket();
-    workerSocket.connect({ port: workerParams.port, host: workerParams.host });
-    workerSocket.on('data', (data) => {
-      workers.push(workerParams);
-      const resp = JSON.parse(data);
-      delete resp.taskId;
-      console.dir(resp);
-      clientSocket.end(JSON.stringify(resp));
+    workersQueue.use((workerParams, cb) => {
+      const workerSocket = new api.net.Socket();
+      workerSocket.connect({
+        port: workerParams.port,
+        host: workerParams.host
+      });
+      workerSocket.on('data', (data) => {
+        const resp = JSON.parse(data);
+        delete resp.taskId;
+        console.dir(resp);
+        clientSocket.end(JSON.stringify(resp));
+        cb();
+      });
+      workerSocket.write(JSON.stringify(obj));
     });
-    workerSocket.write(JSON.stringify(obj));
   });
-}).listen(20000);
+}).listen(50000);
 
 //for workers
 api.net.createServer((socket) => {
   socket.on('data', (data) => {
     const connParams = JSON.parse(data);
-    workers.push({
+    workersQueue.put({
       id: workerId++,
       port: connParams.port,
       host: socket.remoteAddress
     });
-    console.dir(workers);
+    console.dir(workersQueue.queue);
     socket.end();
   });
-}).listen(21000);
+}).listen(51000);

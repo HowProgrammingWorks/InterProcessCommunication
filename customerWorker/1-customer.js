@@ -5,13 +5,13 @@ api.net = require('net');
 api.os = require('os');
 api.metasync = require('metasync');
 
-const host = { workerIp: '127.0.0.1', workerPort: 20000 };
-const workersCount = 15;
+const host = { workerIp: '127.0.0.1', workerPort: 50000 };
+const workersCount = 20;
 const defaultElementsByTask = 1;
 const task = [2, 17, 3, 2, 5, 7, 15, 22, 1, 14, 15, 9, 0, 11, 2, 17, 3, 2, 5];
 
-const createConnection = (task, counter) => {
-  const conn = { port: host.workerPort + counter, host: host.workerIp };
+const createConnection = (task) => {
+  const conn = { port: host.workerPort, host: host.workerIp };
   return (data, cb) => {
     const socket = new api.net.Socket();
     socket.on('data', (readData) => {
@@ -54,11 +54,10 @@ const createTasks = (arr, elementsByPart, clientsCount) => {
 };
 
 const sendTasks = (tasks) => {
-  api.metasync.reduce(
+  api.metasync.map(
     tasks,
-    (prev, curr, cb, counter) => {
-      prev.push(createConnection(curr, 0));
-      cb(null, prev);
+    (curr, cb) => {
+      cb(null, createConnection(curr));
     },
     (err, res) => {
       if (err) console.error(err);

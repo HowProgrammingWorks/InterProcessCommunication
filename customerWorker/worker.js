@@ -2,6 +2,7 @@
 
 module.exports = function() {
   process.on('message', (message) => {
+    const broker = { port: 51000, host: '127.0.0.1' };
     const funcs = {
       0: (item) => (item * 2),
       1: (item) => (item * item)
@@ -16,14 +17,17 @@ module.exports = function() {
       console.log('Task complete. Send result - ' + JSON.stringify(answer));
       socket.end(JSON.stringify(answer));
     };
+    const registerInBroker = (myPort, connParams) => {
+      const brokerConn = new api.net.Socket();
+      const connParam = { port: myPort };
+      brokerConn.connect(connParams, () => {
+        brokerConn.write(JSON.stringify(connParam));
+      });
+    };
 
     const port = parseInt(message);
 
-    const brokerConn = new api.net.Socket();
-    brokerConn.connect({ port: 21000, host: '127.0.0.1' });
-    const connParam = { port };
-    brokerConn.write(JSON.stringify(connParam));
-
+    registerInBroker(port, broker);
     console.log('Listen port # ' + port);
     api.net.createServer((socket) => {
       console.log('Conn: ' + socket.remoteAddress + ':' + socket.remotePort);

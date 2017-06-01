@@ -1,8 +1,8 @@
 'use strict';
 
 module.exports = function() {
-  const workersCount = 15;
-  let startPort = 10000;
+  const workersCount = 5;
+  let startPort = 52000;
 
   const workers = [];
   for (let i = 0; i < workersCount; i++) {
