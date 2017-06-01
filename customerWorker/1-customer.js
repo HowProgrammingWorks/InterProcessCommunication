@@ -3,69 +3,73 @@
 global.api = {};
 api.net = require('net');
 api.os = require('os');
+api.metasync = require('metasync');
 
-const workersCount = 10;
-const startPort = 10000;
+const host = { workerIp: '127.0.0.1', workerPort: 10000 };
+const workersCount = 15;
 const defaultElementsByTask = 1;
-const host = '127.0.0.1';
-const task = [2, 17, 3, 2, 5, 7, 15, 22, 1, 14, 15, 9, 0, 11];
+const task = [2, 17, 3, 2, 5, 7, 15, 22, 1, 14, 15, 9, 0, 11, 2, 17, 3, 2, 5];
 
-const tasks = chunkArray(task, defaultElementsByTask, workersCount);
-sendTasks(tasks);
+const createConnection = (task, counter) => {
+  const conn = { port: host.workerPort + counter, host: host.workerIp };
+  return (data, cb) => {
+    const socket = new api.net.Socket();
+    socket.on('data', (readData) => {
+      console.log('Data received (by client): ' + readData);
+      const res = JSON.parse(readData);
+      data[parseInt(res.index)] = res.answer;
+      cb(data);
+    });
+    socket.connect(conn);
+    console.log('Data send (by client): ' + JSON.stringify(task));
+    socket.write(JSON.stringify(task));
+  };
+};
 
-function chunkArray(arr, elementsByPart, clientsCount) {
+const mergeResult = (data) => {
+  console.log('Merging - ');
+  console.dir(data);
+  //merge array of results in one
+  const res = data.reduce((a, b) => a.concat(b));
+  console.log(task);
+  console.log(res);
+};
+
+const createTasks = (arr, elementsByPart, clientsCount) => {
   const tasks = [];
-  let needWorkers = arr.length / elementsByPart;
+  const needWorkers = arr.length / elementsByPart;
+  let elems = elementsByPart;
   if (needWorkers > clientsCount) {
-    console.log(needWorkers + '-' + elementsByPart);
-    while (needWorkers > clientsCount) {
-      elementsByPart++;
-      needWorkers = arr.length / elementsByPart;
-    }
+    elems = Math.ceil(arr.length / clientsCount);
   }
   let i = 0;
   while (arr.length > 0) {
     tasks.push({
       index: i++,
-      task: arr.splice(0, elementsByPart)
+      task: arr.splice(0, elems)
     });
   }
   return tasks;
-}
-function sendTasks(tasks) {
-  const answers = [];
-  const sockets = [];
-  const answersCount = tasks.length;
-  for (let i = startPort; i < (answersCount + startPort); i++) {
-    const socket = new api.net.Socket();
-    socket.on('data', (data) => {
-      console.log('Data received (by client): ' + data);
-      const res = JSON.parse(data);
-      answers.push(res);
-      if (answers.length === answersCount) {
-        mergeAnswers(answers);
-      }
-    });
-    socket.connect({ port: i, host });
-    sockets.push(socket);
-  }
+};
 
-  tasks.forEach((task, i) => {
-    console.log('Data send (by client): ' + JSON.stringify(task));
-    const dataObj = task;
-    sockets[i].write(JSON.stringify(dataObj));
-  });
-}
+const sendTasks = (tasks) => {
+  api.metasync.reduce(
+    tasks,
+    (prev, curr, cb, counter) => {
+      prev.push(createConnection(curr, counter));
+      cb(null, prev);
+    },
+    (err, res) => {
+      if (err) console.error(err);
+      api.metasync.parallel(
+        res,
+        (data) => {
+          mergeResult(data);
+        },
+        []
+      );
+    },
+    []);
+};
 
-function mergeAnswers(answers) {
-  let res = [];
-  const temp = [];
-  answers.forEach((value) => {
-    temp[value.index] = value.answer;
-  });
-  for (let i = 0; i < temp.length; i++) {
-    res = res.concat(temp[i]);
-  }
-  console.dir(temp);
-  console.dir(res);
-}
+sendTasks(createTasks(task.slice(), defaultElementsByTask, workersCount));
