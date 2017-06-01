@@ -1,8 +1,8 @@
 'use strict';
 
 module.exports = function() {
-
-  const workersCount = api.clientsCount;
+  const workersCount = 15;
+  let startPort = 10000;
 
   const workers = [];
   for (let i = 0; i < workersCount; i++) {
@@ -10,16 +10,10 @@ module.exports = function() {
     workers.push(worker);
   }
 
-  let startPort = global.port;
-
   workers.forEach((worker) => {
-
     worker.send(startPort++);
-
     worker.on('exit', (code) => {
       console.log('exit ' + worker.process.pid + ' ' + code);
     });
-
   });
-
 };

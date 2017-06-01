@@ -46,6 +46,7 @@ const createTasks = (arr, elementsByPart, clientsCount) => {
   while (arr.length > 0) {
     tasks.push({
       index: i++,
+      taskId: 1,
       task: arr.splice(0, elems)
     });
   }
