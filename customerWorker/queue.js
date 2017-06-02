@@ -1,6 +1,6 @@
 'use strict';
 
-exports.Queue = Queue
+exports.Queue = Queue;
 //simple queue for workers
 function Queue() {
   //free workers
@@ -30,7 +30,7 @@ Queue.prototype.put = function(data) {
 
 Queue.prototype.get = function() {
   return this.queue.shift();
-}
+};
 
 Queue.prototype.use = function(func) {
   if (this.queue.length > 0) {
@@ -41,7 +41,7 @@ Queue.prototype.use = function(func) {
   } else {
     this.process.push(func);
   }
-}
+};
 
 Queue.prototype.clear = function() {
   this.queue = [];
