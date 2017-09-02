@@ -1,8 +1,13 @@
 'use strict';
 
+const cluster = require('cluster');
+
 module.exports = () => {
 
-  console.log('Hello from worker ' + process.pid + ' ' + api.cluster.worker.id);
+  console.log(
+    'Hello from worker ' + process.pid +
+    ' ' + cluster.worker.id
+  );
 
   const caltulations = item => item * 2;
 

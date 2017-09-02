@@ -1,9 +1,8 @@
 'use strict';
 
-global.api = {};
-api.net = require('net');
+const net = require('net');
 
-const socket = new api.net.Socket();
+const socket = new net.Socket();
 
 let user;
 
@@ -14,7 +13,7 @@ socket.connect({
   socket.write('Hello from client');
   socket.on('data', (data) => {
     user = JSON.parse(data);
-    console.log('Data received (by client): ' + data);
-    console.log('Age of ' + user.name + ' is ' + user.age);
+    console.log(`Data received (by client): ${data}`);
+    console.log(`Age of ${user.name} is ${user.age}`);
   });
 });

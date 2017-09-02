@@ -1,10 +1,8 @@
 'use strict';
 
-global.api = {};
-api.cluster = require('cluster');
-api.os = require('os');
+const cluster = require('cluster');
 
-if (api.cluster.isMaster) {
+if (cluster.isMaster) {
   require('./master.js')();
 } else {
   require('./worker.js')();

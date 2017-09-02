@@ -1,12 +1,15 @@
 'use strict';
 
+const os = require('os');
+const cluster = require('cluster');
+
 module.exports = () => {
 
-  const cpuCount = api.os.cpus().length;
+  const cpuCount = os.cpus().length;
 
   const workers = [];
   for (let i = 0; i < cpuCount; i++) {
-    const worker = api.cluster.fork();
+    const worker = cluster.fork();
     workers.push(worker);
   }
 
@@ -24,8 +27,8 @@ module.exports = () => {
     worker.on('message', (message) => {
 
       console.log(
-        'message from worker ' + worker.process.pid + ': ' +
-        JSON.stringify(message)
+        'message from worker ' + worker.process.pid +
+        ': ' + JSON.stringify(message)
       );
       results.push(message.result);
 
