@@ -13,6 +13,11 @@ if (cluster.isMaster) {
 
   const workers = [];
 
+  for (let i = 0; i < cpus; i++) {
+    const worker = cluster.fork();
+    workers.push(worker);
+  }
+
   const ipToInt = ip => (
     ip.split('.').reduce((res, item) => (res << 8) + (+item), 0)
   );
@@ -26,11 +31,6 @@ if (cluster.isMaster) {
 
   const server = new net.Server(balancer);
   server.listen(2000);
-
-  for (let i = 0; i < cpus; i++) {
-    const worker = cluster.fork();
-    workers.push(worker);
-  }
 
 } else {
 
