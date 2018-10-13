@@ -6,10 +6,10 @@ console.log('Hello from worker', process.pid, cluster.worker.id);
 
 const caltulations = x => x * 2;
 
-process.on('message', (message) => {
+process.on('message', message => {
 
-  console.log('Message to worker ', process.pid)
-  console.log(JSON.stringify(message));
+  console.log('Message to worker ', process.pid);
+  console.log(message);
 
   const result = message.task.map(caltulations);
   process.send({ result });
