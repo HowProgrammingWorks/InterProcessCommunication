@@ -1,7 +1,7 @@
 'use strict';
 
-const os = require('os');
-const cluster = require('cluster');
+const os = require('node:os');
+const cluster = require('node:cluster');
 
 console.log('Started master:', process.pid);
 

@@ -1,6 +1,6 @@
 'use strict';
 
-const net = require('net');
+const net = require('npde:net');
 
 const user = { name: 'Marcus Aurelius', age: 1895 };
 

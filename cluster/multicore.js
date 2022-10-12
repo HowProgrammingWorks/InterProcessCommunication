@@ -1,6 +1,6 @@
 'use strict';
 
-const cluster = require('cluster');
+const cluster = require('node:cluster');
 
 if (cluster.isMaster) {
   require('./master.js');

@@ -1,7 +1,7 @@
 'use strict';
 
-const os = require('os');
-const cp = require('child_process');
+const os = require('node:os');
+const cp = require('node:child_process');
 
 console.log('Started master:', process.pid);
 
