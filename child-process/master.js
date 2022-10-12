@@ -17,15 +17,15 @@ for (let i = 0; i < cpuCount; i++) {
 const task = [2, 17, 3, 2, 5, 7, 15, 22, 1, 14, 15, 9, 0, 11];
 const results = [];
 
-workers.forEach(worker => {
+workers.forEach((worker) => {
 
   worker.send({ task });
 
-  worker.on('exit', code => {
+  worker.on('exit', (code) => {
     console.log('Worker exited:', worker.pid, code);
   });
 
-  worker.on('message', message => {
+  worker.on('message', (message) => {
 
     console.log('Message from worker', worker.pid);
     console.log(message);

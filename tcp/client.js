@@ -9,7 +9,7 @@ socket.connect({
   host: '127.0.0.1',
 }, () => {
   socket.write('Hello from client');
-  socket.on('data', data => {
+  socket.on('data', (data) => {
     const message = data.toString();
     const user = JSON.parse(message);
     console.log('Data received (by client):', data);
