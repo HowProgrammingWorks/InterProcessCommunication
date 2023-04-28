@@ -3,7 +3,7 @@
 const os = require('node:os');
 const cp = require('node:child_process');
 
-console.log('Started master:', process.pid);
+console.log('Started primary:', process.pid);
 
 const cpuCount = os.cpus().length;
 const workers = [];
@@ -18,7 +18,6 @@ const task = [2, 17, 3, 2, 5, 7, 15, 22, 1, 14, 15, 9, 0, 11];
 const results = [];
 
 workers.forEach((worker) => {
-
   worker.send({ task });
 
   worker.on('exit', (code) => {
@@ -39,5 +38,4 @@ workers.forEach((worker) => {
   });
 
   setTimeout(() => process.exit(1), 5000);
-
 });
